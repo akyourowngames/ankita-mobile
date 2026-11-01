@@ -1,0 +1,23 @@
+node_modules/
+.expo/
+dist/
+*.log
+.env
+.env.local
+.build-tools/
+android/local.properties
+android/.gradle/
+android/app/build/
+android/build/
+
+# Release binaries are attached to GitHub releases, not committed.
+release/*.apk
+release/*.apk.idsig
+release/bundles/
+
+# Editor and OS metadata.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.qoder/

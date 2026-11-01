@@ -1,0 +1,11 @@
+{
+  "baseUrl": "https://backend.composio.dev/api/v3.1",
+  "sessionPath": "/tool_router/session",
+  "secretId": "composio",
+  "maxToolRounds": 8,
+  "maxTools": 64,
+  "maxResultChars": 24000,
+  "pageSize": 50,
+  "maxPages": 20,
+  "maxResponseBytes": 1048576
+}

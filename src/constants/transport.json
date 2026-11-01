@@ -1,0 +1,8 @@
+{
+  "proxyPath": "/__chief/provider",
+  "sessionPath": "/__chief/session",
+  "requestTimeoutMs": 120000,
+  "maxBodyBytes": 8388608,
+  "loopbackHost": "127.0.0.1",
+  "defaultWebPort": 4173
+}

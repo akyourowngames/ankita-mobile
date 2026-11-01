@@ -1,0 +1,83 @@
+{
+  "expo": {
+    "name": "Ankita",
+    "slug": "chief-mobile",
+    "version": "2.1.0",
+    "orientation": "portrait",
+    "scheme": "chief",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0E0F11"
+    },
+    "android": {
+      "package": "com.chief.mobile",
+      "versionCode": 5,
+      "softwareKeyboardLayoutMode": "resize"
+    },
+    "ios": {
+      "bundleIdentifier": "com.chief.mobile",
+      "buildNumber": "5",
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "plugins": [
+      "./plugins/with-windows-cxx.cjs",
+      "./plugins/with-async-storage-size.cjs",
+      "expo-asset",
+      "expo-secure-store",
+      "expo-notifications",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Ankita uses the camera only to scan the pairing code shown on your computer."
+        }
+      ],
+      [
+        "expo-sharing",
+        {
+          "android": {
+            "enabled": true,
+            "singleShareMimeTypes": ["text/plain", "text/markdown", "text/csv", "application/json", "application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif"],
+            "multipleShareMimeTypes": ["text/plain", "text/markdown", "text/csv", "application/json", "application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif"]
+          },
+          "ios": {
+            "enabled": true,
+            "appGroupId": "group.com.chief.mobile",
+            "activationRule": {
+              "supportsText": true,
+              "supportsWebUrlWithMaxCount": 20,
+              "supportsImageWithMaxCount": 20,
+              "supportsFileWithMaxCount": 20,
+              "supportsAttachmentsWithMaxCount": 20
+            }
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "userInterfaceStyle": "automatic",
+    "web": {
+      "name": "Ankita",
+      "shortName": "Ankita",
+      "bundler": "metro",
+      "themeColor": "#0E0F11",
+      "backgroundColor": "#0E0F11",
+      "favicon": "./assets/icon.png"
+    },
+    "icon": "./assets/icon.png"
+  }
+}

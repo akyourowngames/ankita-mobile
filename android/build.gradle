@@ -1,0 +1,35 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+  repositories {
+    google()
+    mavenCentral()
+  }
+  dependencies {
+    classpath('com.android.tools.build:gradle')
+    classpath('com.facebook.react:react-native-gradle-plugin')
+    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+  }
+}
+
+allprojects {
+  repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }
+  }
+}
+
+// Chief Windows C++ compiler driver
+if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+    subprojects { nativeProject ->
+        ['com.android.application', 'com.android.library'].each { pluginId ->
+            nativeProject.plugins.withId(pluginId) {
+                nativeProject.extensions.getByName('android').defaultConfig.externalNativeBuild.cmake.cppFlags '--driver-mode=g++'
+            }
+        }
+    }
+}
+
+apply plugin: "expo-root-project"
+apply plugin: "com.facebook.react.rootproject"

@@ -1,0 +1,12 @@
+{
+  "units": "Bytes, characters, milliseconds and redirect counts bound untrusted public content.",
+  "webProxyPath": "/__chief_public_web",
+  "webMaxBytes": 750000,
+  "webTextChars": 18000,
+  "webTitleChars": 240,
+  "urlChars": 4096,
+  "redirects": 3,
+  "requestMs": 30000,
+  "searchResults": 5,
+  "braveEndpoint": "https://api.search.brave.com/res/v1/web/search"
+}
