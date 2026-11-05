@@ -1,4 +1,5 @@
 import { registerRootComponent } from 'expo';
+import './src/runtime/abortSignal';
 import App from './App';
 
 // Expo entry point for native + web.

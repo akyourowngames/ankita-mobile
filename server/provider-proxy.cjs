@@ -31,7 +31,10 @@ function createProviderProxy() {
     if (path === config.sessionPath) { if (req.method !== 'GET') return fail(405, 'Method not allowed'); res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ token })); }
     const received = String(req.headers['x-chief-session'] || '');
     const receivedBytes = Buffer.from(received), tokenBytes = Buffer.from(token);
-    if (req.method !== 'POST' || receivedBytes.length !== tokenBytes.length || !timingSafeEqual(receivedBytes, tokenBytes)) return fail(403, 'Invalid app relay session');
+    if (req.method !== 'POST' || receivedBytes.length !== tokenBytes.length || !timingSafeEqual(receivedBytes, tokenBytes)) {
+      res.setHeader(config.relayErrorHeader, config.sessionInvalidCode);
+      return fail(403, 'Invalid app relay session');
+    }
     const controller = new AbortController(), timer = setTimeout(() => controller.abort(), companionRequest ? companion.requestMs : publicRequest ? publicConfig.requestMs : config.requestTimeoutMs);
     const cancel = () => controller.abort(); req.on('aborted', cancel); res.on('close', cancel);
     try {

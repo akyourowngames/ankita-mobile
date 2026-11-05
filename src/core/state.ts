@@ -1,4 +1,5 @@
 import { DATA_VERSION, DEFAULT_SYSTEM_PROMPT } from '../constants/appConfig.ts';
+import { migrateLegacyProviderEndpoint } from '../constants/providerEndpoints.ts';
 import { emptyAssistantState, restoreAssistantState } from '../assistant/records.ts';
 import { restoreToolReceipts, identity } from '../assistant/validation.ts';
 import { ASSISTANT_LIMITS } from '../assistant/config.ts';
@@ -52,7 +53,7 @@ export function restoreState(raw: string): AppState {
       if (!p || Object.keys(p).some(k => !['id', 'name', 'kind', 'baseUrl', 'model', 'keyRequired', 'models', 'modelsUpdatedAt'].includes(k)) || ![p.id, p.name, p.baseUrl, p.model].every(v => typeof v === 'string') || !['openai', 'anthropic', 'chief'].includes(p.kind) || typeof p.keyRequired !== 'boolean') throw new Error();
       if (p.models !== undefined && (!Array.isArray(p.models) || !p.models.every(m => typeof m === 'string'))) throw new Error();
       if (p.modelsUpdatedAt !== undefined && !Number.isFinite(p.modelsUpdatedAt)) throw new Error();
-      return { id: p.id, name: p.name, kind: p.kind, baseUrl: p.baseUrl, model: p.model, keyRequired: p.keyRequired, ...(p.models ? { models: p.models, modelsUpdatedAt: p.modelsUpdatedAt } : {}) };
+      return { id: p.id, name: p.name, kind: p.kind, baseUrl: p.kind === 'openai' ? migrateLegacyProviderEndpoint(p.baseUrl) : p.baseUrl, model: p.model, keyRequired: p.keyRequired, ...(p.models ? { models: p.models, modelsUpdatedAt: p.modelsUpdatedAt } : {}) };
     });
     const conversations: Conversation[] = data.conversations.map((c: Conversation) => {
       if (!c || typeof c.id !== 'string' || typeof c.title !== 'string' || !Number.isFinite(c.createdAt) || !Number.isFinite(c.updatedAt) || !Array.isArray(c.messages)) throw new Error();

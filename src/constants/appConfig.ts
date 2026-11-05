@@ -7,7 +7,7 @@ export const APP_NAME = 'Ankita';
 export const APP_SLUG = 'chief-mobile';
 
 // Semantic version of the mobile client (unit: semver string). Why constant: shown in Settings + sent as header.
-export const APP_VERSION = '2.1.0';
+export const APP_VERSION = '2.1.1';
 
 // Deep-link scheme (unit: URI scheme, no ://). Why constant: used in navigation + auth callbacks.
 export const DEEP_LINK_SCHEME = 'chief';

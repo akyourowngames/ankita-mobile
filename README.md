@@ -26,7 +26,9 @@ The preview relay runs only on this computer and requires an app same-origin ses
 
 The compatible Chief-server provider remains a text-only backend. It cannot execute phone model tools or selected PDF/image inputs; select a compatible provider or turn phone tools off for that backend.
 
-Native credentials use Expo SecureStore. Browser keys survive refresh in this tab using session storage; remove them when finished. Blocked tab storage falls back to memory and requires re-entry after refresh. Scripts on this origin can read tab storage, and browser session restore may retain it. Keys are excluded from saved app state, local storage and exports. Migration preserves existing chats, providers, teammates, cached models, storage/package/deep-link IDs and Android signing identity.
+Native credentials use Expo SecureStore. Browser keys are saved in this browser profile and survive restarts. Older tab-only keys migrate when read. Any script on this origin and other people using this browser profile can access browser keys. Blocked browser storage falls back to memory and requires re-entry after a restart. Keys are kept separately from saved app state and excluded from conversation exports. Migration preserves existing chats, providers, teammates, cached models, storage/package/deep-link IDs and Android signing identity.
+
+Kilo uses `https://ai-gateway.kilo.ai/api/v1`. Existing saved providers using the former Kilo root upgrade automatically. You can cancel a connection or model check while keeping entered details. Browser checks recover after a temporary app-server failure or restart. See the [Kilo API reference](https://kilo.ai/docs/gateway/api-reference).
 
 ## Memory and permissions
 
@@ -74,7 +76,7 @@ The versioned protocol supports capabilities, owned runs, tool events, approvals
 
 ## Android delivery and build
 
-The internal-distribution artifact is [Ankita 2.0.1 for Android](release/Ankita-2.0.1-android.apk); [2.0.0](release/Ankita-2.0.0-android.apk) and [1.1.0](release/Ankita-1.1.0-android.apk) remain available. Package `com.chief.mobile` and the private release signer are preserved for upgrades. See the [verification ledger](docs/mobile-verification.md) for actual checks and digest. Installation, upgrade and OS reminder delivery still need a physical phone. This is not a Play Store publication or an Apple-signed release.
+The internal-distribution artifact is [Ankita 2.1.1 for Android](https://github.com/akyourowngames/ankita-mobile/releases/tag/v2.1.1). Package `com.chief.mobile` and the private release signer are preserved for upgrades. See the [verification ledger](docs/mobile-verification.md) for actual checks and digest. Installation, upgrade and OS reminder delivery still need a physical phone.
 
 `node scripts/prepare-android.mjs` prepares local JDK/SDK archives with official checksums. After native dependency/config changes, run `npx expo prebuild --platform android --no-install`, then:
 

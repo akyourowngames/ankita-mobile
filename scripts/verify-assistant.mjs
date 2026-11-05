@@ -62,7 +62,10 @@ const snapshot = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)
 const waitSaved = async predicate => { await page.waitForFunction(({ key, source }) => { const data = JSON.parse(localStorage.getItem(key)); return data && new Function('state', `return (${source})(state)`)(data); }, { key: STORAGE_KEY, source: predicate.toString() }); };
 const shot = async name => { await fs.mkdir(SHOTS, { recursive: true }); await page.waitForTimeout(VERIFY_TIMEOUTS.visualSettleMs); await page.screenshot({ path: fileURLToPath(new URL(`${name}.png`, SHOTS)), fullPage: true }); };
 try {
-  await page.goto(process.env.CHIEF_VERIFY_URL || `http://127.0.0.1:${web.address().port}`);
+  const readyMs = process.env.CHIEF_VERIFY_URL ? VERIFY_TIMEOUTS.developmentMs : VERIFY_TIMEOUTS.interactionMs;
+  await page.goto(process.env.CHIEF_VERIFY_URL || `http://127.0.0.1:${web.address().port}`, { timeout: readyMs });
+  // HTML can arrive before a cold Metro bundle mounts the chat controls.
+  await field('Message').waitFor({ timeout: readyMs });
   await goTo('Assistant'); await button('Memory').click(); await button('Add memory').click();
   await field('Memory text').fill('Lives in a quiet neighbourhood'); await button('Save memory').click();
   await button('Edit Lives in a quiet neighbourhood').click(); await page.getByRole('switch', { name: 'Pin in every conversation' }).click(); await button('Save memory').click();

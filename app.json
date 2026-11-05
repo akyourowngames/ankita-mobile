@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ankita",
     "slug": "chief-mobile",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "orientation": "portrait",
     "scheme": "chief",
     "newArchEnabled": true,
@@ -11,12 +11,12 @@
     },
     "android": {
       "package": "com.chief.mobile",
-      "versionCode": 5,
+      "versionCode": 6,
       "softwareKeyboardLayoutMode": "resize"
     },
     "ios": {
       "bundleIdentifier": "com.chief.mobile",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "supportsTablet": true,
       "config": {
         "usesNonExemptEncryption": false

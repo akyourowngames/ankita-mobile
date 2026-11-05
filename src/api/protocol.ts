@@ -2,6 +2,7 @@ import { ANTHROPIC_VERSION, MAX_RESPONSE_CHARS, MAX_TOKENS, MAX_PROVIDER_RESPONS
 import { readJSON } from './readJSON.ts';
 import type { Provider } from '../core/state.ts';
 import endpointPolicy from './endpoint.cjs';
+import { migrateLegacyProviderEndpoint } from '../constants/providerEndpoints.ts';
 import { toolCollector, type ToolCall } from './toolCalls.ts';
 import type { ToolDefinition } from './composioProtocol.ts';
 import type { LibraryAsset } from '../assistant/types.ts';
@@ -14,9 +15,9 @@ function contentBlocks(message: WireMessage, kind: Provider['kind']) {
 }
 export type StreamEvent = { choices?: { delta?: { content?: string }; message?: { content?: string }; finish_reason?: string }[]; delta?: { text?: string }; type?: string; error?: unknown; content?: { text?: string }[]; reply?: string };
 
-export const normalizeEndpoint = endpointPolicy.normalizeEndpoint;
+export const normalizeEndpoint = (baseUrl: string, kind: Provider['kind'] = 'openai') => endpointPolicy.normalizeEndpoint(kind === 'openai' ? migrateLegacyProviderEndpoint(baseUrl) : baseUrl);
 export function buildRequest(provider: Provider, key: string, messages: WireMessage[], system: string, tools?: ToolDefinition[]) {
-  const base = normalizeEndpoint(provider.baseUrl);
+  const base = normalizeEndpoint(provider.baseUrl, provider.kind);
   if (!provider.model.trim() && provider.kind !== 'chief') throw new Error('Choose a model in provider settings first.');
   if (provider.keyRequired && !key.trim()) throw new ProviderError('missing_key');
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };

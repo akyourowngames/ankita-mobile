@@ -1,9 +1,10 @@
 import { BACKEND_BASE_URL } from './appConfig.ts';
+import { KILO_API_BASE_URL } from './providerEndpoints.ts';
 import type { ProviderKind } from '../core/state.ts';
 export type ProviderPreset = { id: string; name: string; initials: string; kind: ProviderKind; baseUrl: string; keyRequired: boolean; description: string };
 // Official API roots are editable defaults, never guessed local addresses or model choices.
 export const PROVIDER_PRESETS: ProviderPreset[] = [
-  { id: 'kilo', name: 'Kilo AI Gateway', initials: 'K', kind: 'openai', baseUrl: 'https://api.kilo.ai/api/gateway', keyRequired: false, description: 'Optional gateway key; free routes have rate limits' },
+  { id: 'kilo', name: 'Kilo AI Gateway', initials: 'K', kind: 'openai', baseUrl: KILO_API_BASE_URL, keyRequired: false, description: 'Optional gateway key; free routes have rate limits' },
   { id: 'openrouter', name: 'OpenRouter', initials: 'OR', kind: 'openai', baseUrl: 'https://openrouter.ai/api/v1', keyRequired: true, description: 'Many models, one account' },
   { id: 'openai', name: 'OpenAI', initials: 'AI', kind: 'openai', baseUrl: 'https://api.openai.com/v1', keyRequired: true, description: 'Your OpenAI API account' },
   { id: 'anthropic', name: 'Anthropic', initials: 'A', kind: 'anthropic', baseUrl: 'https://api.anthropic.com/v1', keyRequired: true, description: 'Claude, directly from Anthropic' },

@@ -1,6 +1,10 @@
 {
   "proxyPath": "/__chief/provider",
   "sessionPath": "/__chief/session",
+  "relayErrorHeader": "x-chief-relay-error",
+  "sessionInvalidCode": "session_invalid",
+  "handshakeTimeoutMs": 5000,
+  "maxSessionBytes": 4096,
   "requestTimeoutMs": 120000,
   "maxBodyBytes": 8388608,
   "loopbackHost": "127.0.0.1",

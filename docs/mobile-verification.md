@@ -1,5 +1,47 @@
 # Mobile verification ledger
 
+## Android 2.1.1 publication, 2026-11-05
+
+- The provider fixes below ship as version 2.1.1, Android version code 6. Expo metadata, package metadata, the lockfile, runtime version and native Gradle version are synchronized. A new regression first failed against the old native version and then passed after synchronization.
+- Full serial tests passed 209/209 with zero failures, skips or cancellations in 44416.3165 ms. Typecheck passed.
+- Release build passed in 8m 36s with 387 tasks, 35 executed and 352 up-to-date. Android bundled 846 modules. The APK uses the existing private v2/v3 release signer and both arm64-v8a/x86_64 ABIs.
+- Artifact `release/Ankita-2.1.1-android.apk` is 60161709 bytes. SHA-256 is `fc2c6e0844fcf5f1e0725cca68c21bec2e531032a75eb9bee205b8cce70d2e38`.
+- Physical installation and upgrade, native OS features, paid-provider access and a signed iOS build remain unverified. The runtime, HTTP and browser evidence below applies to the included fixes.
+
+## Provider reliability and setup polish, 2026-11-05
+
+### Reproduced failures
+
+- Android's installed React Native controller has no instance `throwIfAborted()` or `reason`. Using that actual controller with `streamRequest` failed before sending HTTP. The captured trace was `requests=0` and `signal.throwIfAborted is not a function`. The initial four native regression checks all failed.
+- The real browser app reached a CORS-less HTTP fixture for normal setup and chat, but failed to recover after a temporary handshake failure or app-server restart. A pending check also had no Cancel action. Those three added acceptance checks failed before the fixes.
+- The new Kilo preset and saved-provider migration regressions initially failed two of four assertions. Both old and current anonymous catalogue endpoints returned HTTP 200 directly, so the former URL alone did not establish the Android failure cause.
+
+### Changes
+
+- `src/runtime/abortSignal.ts` installs the missing native cancellation APIs before App imports. It preserves modern runtime implementations, stable cancellation reasons and first-abort ownership. The installed Expo startup order and native fetch implementation were inspected against the actual dependency source.
+- `src/api/browserRelay.ts` shares only a recoverable session handshake. Failed handshakes can retry, caller cancellation settles independently and an explicit rejected local token refreshes once before forwarding. Provider authorization errors and ambiguous network outcomes never replay a generation or action. The relay retains its loopback, origin, token and route guards.
+- `src/constants/providerEndpoints.ts` defines Kilo's documented `https://ai-gateway.kilo.ai/api/v1` root. Exact former OpenAI-compatible Kilo roots migrate on restore and pasted-URL validation. Provider IDs, saved-key ownership, chosen models and custom endpoints are covered. The current root follows the [Kilo API reference](https://kilo.ai/docs/gateway/api-reference).
+- `src/screens/ProvidersScreen.tsx` tracks each operation separately, prevents overlapping actions, cancels checks while retaining details and suppresses stale results. Saving and removal block conflicting edits and dismissal. The key visibility button is compact and touch-sized. Typed messages distinguish app connection failures, provider authentication, rate limits, incompatible catalogues and model-test timeouts.
+- README browser-key storage guidance now matches the durable browser-key behavior already present in the baseline.
+
+### Executed checks
+
+- Full serial automated suite passed 208/208 with zero failures, skips or cancellations in 52366.574 ms. The command was `node --test --test-concurrency=1`. Typecheck passed with no diagnostics.
+- The nine native regression checks pass. They use the actual installed React Native AbortController, a Node HTTP adapter for its wire signal, real HTTP generation/model tests for OpenAI, Anthropic and Chief, durable assistant mutation, cancellation, idempotence and startup import order. Traces include `ANDROID_ABORT_HTTP_OK requests=1` and `ANDROID_MODEL_HTTP_OK kind=openai requests=1` with corresponding Anthropic and Chief traces.
+- The provider browser acceptance file passes five checks. Traces are `PROVIDER_SETUP_CHAT_HTTP_OK requests=3`, `PROVIDER_HANDSHAKE_RECOVERY_OK`, `PROVIDER_RESTART_RECOVERY_OK`, `PROVIDER_CHECK_CANCEL_OK providerRequests=0` and `PROVIDER_DISCOVERY_ERRORS_RECOVERY_OK requests=4`. Checks include selecting a discovered model, actual harmless tool generation, saved-provider chat, a single active spinner, disabled conflicting actions, private error-text suppression and recovery without reloading.
+- Live anonymous Kilo catalogues using both the actual preset and a restored legacy provider returned HTTP 200, 382 models and no redirect. No user API key was read or transmitted by these checks.
+- Production acceptance passed `MOBILE_UI_OK` with 16 real HTTP generation requests and `ASSISTANT_UI_OK` with 15. It also passed `MOBILE_PHONE_LAYOUT_OK`, `CLEAN_CHAT_OK`, `OUTPUT_UI_OK`, `OUTPUT_LIFECYCLE_OK`, `POCKET_WORK_UI_OK` and the three mobile-pairing checks. These cover setup, streamed chat, Stop, saved models, teammate drafts, settings, approvals, memory, tasks, document imports, desktop delegation, background work, structured editing and actual CSV/ICS downloads. Phone and wide layouts were exercised from 320 to 1280 CSS pixels. No unexpected page or console errors were reported.
+- Diagnostic screenshots were written to OS temporary directories. The provider editor, narrow appearance screen and desktop chat captures were inspected.
+- Android `scripts/build-apk.ps1` passed with `BUILD SUCCESSFUL in 10m 59s`, 387 tasks, 14 executed and 373 up-to-date. It bundled 846 modules and signed the rebuilt `release/Ankita-2.1.0-android.apk` using the existing private signer. Existing SDK XML and Gradle deprecation warnings remained non-fatal.
+- `scripts/verify-apk.ps1` passed signature v2/v3 verification and printed `APK_CONTENT_OK`. It checked package `com.chief.mobile`, version 2.1.0/code 5, minimum SDK 24, target SDK 36, both arm64-v8a/x86_64 libraries, bundled font, manifest, dex and offline Hermes bundle. APK size is 60161709 bytes. SHA-256 is `15b221ade45cf144dba38fb0084c06e3aea5d9f5196b9ec630c70a056eadb5bb`.
+- All-platform bundle export passed with web 570, iOS 838 and Android 846 modules. Final web export also passed with 570 modules. The Android release source map includes `/src/runtime/abortSignal.ts` and printed `ANDROID_BUNDLE_COMPATIBILITY_OK`.
+- Development-mode mobile and assistant acceptance both passed with 15 provider HTTP generation requests each, zero unexpected console/page errors and the narrow/wide layout checks. The first assistant run started navigation before the cold development bundle mounted its controls and timed out waiting for Settings. `scripts/verify-assistant.mjs` now awaits the actual Message field before navigation. The same development sequence then exited 0.
+- Final rebuilt-web provider acceptance passed all five checks again. Whitespace validation passed. Temporary verifier copies were used to redirect existing screenshot outputs outside tracked release artwork and were removed after execution.
+
+### Remaining device coverage
+
+The native checks execute the installed controller against real HTTP with a Node wire adapter. They do not execute Expo's Android bridge on a phone. ADB reported no connected device and the installed SDK has no emulator. Physical installation, SecureStore, OS share sheets, keyboard, camera, reminders and push delivery remain device acceptance work. Paid provider-account access and a signed iOS app are also untested.
+
 ## 2.0.1 - Chat simplification and sidebar-only navigation, 2026-10-25
 
 - Source backup: the prior baseline remains `../chief-mobile-source-backup-2026-10-25-2034` (pre-redesign `src`, `App.tsx`, `package.json`). The project still has no Git repository.

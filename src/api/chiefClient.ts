@@ -9,6 +9,8 @@ import type { IntegrationConfig } from '../core/state';
 import { createPhoneToolSession, type PhoneToolOptions } from '../assistant/tools';
 import { ASSISTANT_TIMING } from '../assistant/config';
 import { boundedWait } from '../assistant/deadline';
+import { ProviderError, responseError } from './providerErrors';
+import { ConnectionError } from './connectionErrors';
 
 export async function postChat(provider: Provider, key: string, messages: WireMessage[], system: string, signal: AbortSignal, onDelta: (text: string) => void, options?: { integrations: IntegrationConfig; composioKey: string; activity: (text: string) => void; phone?: Omit<PhoneToolOptions, 'signal' | 'external'> }): Promise<string> {
   const controller = new AbortController();
@@ -31,16 +33,17 @@ export async function postChat(provider: Provider, key: string, messages: WireMe
 }
 export async function discoverModels(provider: Provider, key: string, signal?: AbortSignal): Promise<string[]> {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort(), MODEL_TEST_TIMEOUT_MS);
-  const abort = () => controller.abort(); signal?.addEventListener('abort', abort, { once: true }); if (signal?.aborted) abort();
+  const abort = () => controller.abort(signal?.reason); signal?.addEventListener('abort', abort, { once: true }); if (signal?.aborted) abort();
   try {
-    if (provider.keyRequired && !key) throw new Error('Enter your API key first.');
+    controller.signal.throwIfAborted();
+    if (provider.keyRequired && !key.trim()) throw new ProviderError('missing_key');
     const headers: Record<string, string> = provider.kind === 'anthropic' ? { 'x-api-key': key, 'anthropic-version': ANTHROPIC_VERSION, 'anthropic-dangerous-direct-browser-access': 'true' } : key ? { Authorization: `Bearer ${key}` } : {};
-    const res = await providerFetch(`${normalizeEndpoint(provider.baseUrl)}${provider.kind === 'chief' ? '/health' : '/models'}`, { headers, signal: controller.signal, redirect: 'error' });
-    if (!res.ok) throw new Error(`Connection returned HTTP ${res.status}. Check the endpoint and API key.`);
+    const res = await providerFetch(`${normalizeEndpoint(provider.baseUrl, provider.kind)}${provider.kind === 'chief' ? '/health' : '/models'}`, { headers, signal: controller.signal, redirect: 'error' });
+    if (!res.ok) throw await responseError(res, controller.signal);
     const data = await readJSON(res, controller.signal, MAX_PROVIDER_RESPONSE_BYTES, 'The endpoint');
     if (provider.kind === 'chief') return [];
-    if (!Array.isArray(data.data)) throw new Error('The endpoint did not return a compatible model list. Enter a model manually.');
+    if (!Array.isArray(data?.data)) throw new ConnectionError('catalogue_format');
     return [...new Set<string>(data.data.map((m: { id?: unknown } | null) => m?.id).filter((id: unknown): id is string => typeof id === 'string'))].sort();
-  } catch (error) { if (controller.signal.aborted) throw new Error('Connection timed out or was cancelled. Check the server address.'); throw error; }
+  } catch (error) { if (signal?.aborted) throw signal.reason; if (controller.signal.aborted) throw new ConnectionError('catalogue_timeout'); throw error; }
   finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
 }

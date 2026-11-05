@@ -23,6 +23,15 @@ test('app.json stays in sync with appConfig', () => {
   assert.equal(appJson.version, version, 'mobile version drifted');
   assert.equal(json('package.json').version, version);
   assert.equal(json('package-lock.json').version, version);
+  assert.equal(json('package-lock.json').packages[''].version, version);
+});
+
+test('the packaged Android version and native build numbers match Expo metadata', () => {
+  const config = json('app.json').expo;
+  const gradle = read('android/app/build.gradle');
+  assert.equal(/versionName "([^"]+)"/.exec(gradle)?.[1], config.version);
+  assert.equal(Number(/versionCode (\d+)/.exec(gradle)?.[1]), config.android.versionCode);
+  assert.equal(config.ios.buildNumber, String(config.android.versionCode));
 });
 
 test('package.json is private closed-source', () => {
